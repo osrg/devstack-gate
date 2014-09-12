@@ -40,6 +40,12 @@ config:
     features: [zeromq]
   ceph:
     features: [ceph]
+  ofagent:
+    features: [ofagent]
+    rm-features: [ceilometer, swift, horizon, heat, trove, sahara, grenade]
+  ryuplugin:
+    features: [ryuplugin]
+    rm-features: [ceilometer, swift, horizon, heat, trove, sahara, grenade]
 
 branches:
   # The value of ""default" is the name of the "trunk" branch
@@ -89,7 +95,7 @@ features:
 
   neutron:
     base:
-      services: [quantum, q-svc, q-agt, q-dhcp, q-l3, q-meta, q-lbaas, q-vpn, q-fwaas, q-metering]
+      services: [neutron, q-svc, q-agt, q-dhcp, q-l3, q-meta, q-lbaas, q-vpn, q-fwaas, q-metering]
       rm-services: [n-net]
 
   swift:
@@ -147,3 +153,12 @@ features:
   ceph:
     base:
       services: [ceph]
+
+  ofagent:
+    base:
+      rm-services: [q-metering]
+
+  ryuplugin:
+    base:
+      services: [ryu]
+      rm-services: [q-metering]

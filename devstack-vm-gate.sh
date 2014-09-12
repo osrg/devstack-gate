@@ -110,7 +110,7 @@ VIRT_DRIVER=$DEVSTACK_GATE_VIRT_DRIVER
 SWIFT_REPLICAS=1
 LOG_COLOR=False
 PIP_USE_MIRRORS=False
-USE_GET_PIP=1
+USE_GET_PIP=0
 # Don't reset the requirements.txt files after g-r updates
 UNDO_REQUIREMENTS=False
 CINDER_PERIODIC_INTERVAL=10
@@ -285,6 +285,31 @@ EOF
         # Sometimes we do want the test packages
         echo "INSTALL_TESTONLY_PACKAGES=True" >> localrc
     fi
+
+    if [ "$DEVSTACK_GATE_RYUPLUGIN" -eq "1" ]; then
+        cat <<EOF >>localrc
+Q_PLUGIN=ryu
+NETWORK_API_EXTENSIONS=service-type,ext-gw-mode,security-group,fwaas,binding,external-net,router,lbaas,extraroute,quotas
+RYU_APPS=ryu.app.gre_tunnel,ryu.app.quantum_adapter,ryu.app.rest,ryu.app.rest_conf_switch,ryu.app.rest_tunnel,ryu.app.tunnel_port_updater,ryu.app.rest_quantum
+EOF
+    elif [ "$DEVSTACK_GATE_OFAGENT" -eq "1" ]; then
+        cat <<EOF >>localrc
+Q_PLUGIN=ml2
+Q_AGENT=ofagent
+Q_ML2_PLUGIN_MECHANISM_DRIVERS=ofagent,l2population
+Q_USE_PROVIDERNET_FOR_PUBLIC=True
+ENABLE_TENANT_TUNNELS=True
+TENANT_TUNNEL_RANGES=1100:1199
+PUBLIC_PHYSICAL_NETWORK=public
+OVS_BRIDGE_MAPPINGS=public:br-ex
+NETWORK_API_EXTENSIONS=service-type,ext-gw-mode,security-group,l3_agent_scheduler,lbaas_agent_scheduler,fwaas,binding,provider,agent,quotas,dhcp_agent_scheduler,multi-provider,external-net,router,allowed-address-pairs,vpnaas,extra_dhcp_opt,lbaas,extraroute
+EOF
+        cat <<EOF >>local.conf
+[[post-config|/etc/neutron/plugins/ml2/ml2_conf.ini]]
+[agent]
+l2_population=True
+EOF
+    fi
 }
 
 if [[ -n "$DEVSTACK_GATE_GRENADE" ]]; then
@@ -445,6 +470,20 @@ if [[ "$DEVSTACK_GATE_TEMPEST" -eq "1" ]]; then
     elif [[ "$DEVSTACK_GATE_SMOKE_SERIAL" -eq "1" ]] ; then
         echo "Running tempest smoke tests"
         sudo -H -u tempest tox -esmoke-serial
+    elif [[ "$DEVSTACK_GATE_RYUPLUGIN" -eq "1" ]] ; then
+        echo "Running tempest neutron tests"
+        sudo -H -u tempest tox -eall -- --concurrency=$TEMPEST_CONCURRENCY \
+            tempest.api.network.test_networks \
+            tempest.api.network.test_floating_ips \
+            tempest.api.network.test_security_groups \
+            tempest.api.network.test_security_groups_negative \
+            tempest.api.network.test_load_balancer \
+            tempest.api.network.test_service_type_management
+    elif [[ "$DEVSTACK_GATE_OFAGENT" -eq "1" ]] ; then
+        echo "Running tempest neutron tests"
+        sudo -H -u tempest tox -eall -- --concurrency=$TEMPEST_CONCURRENCY \
+            tempest.api.network \
+            tempest.scenario.test_network_basic_ops
     else
         echo "Running tempest smoke tests"
         sudo -H -u tempest tox -esmoke -- --concurrency=$TEMPEST_CONCURRENCY

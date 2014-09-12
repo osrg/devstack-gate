@@ -27,6 +27,9 @@ GIT_BRANCH=${GIT_BRANCH:-master}
 
 # sshd may have been compiled with a default path excluding */sbin
 export PATH=$PATH:/usr/local/sbin:/usr/sbin
+# third party project base and branch
+DEVSTACK_GATE_3PPRJ_BASE=${DEVSTACK_GATE_3PPRJ_BASE:-osrg}
+DEVSTACK_GATE_3PBRANCH=${DEVSTACK_GATE_3PBRANCH:-ofaci}
 
 source $WORKSPACE/devstack-gate/functions.sh
 
@@ -98,7 +101,7 @@ PROJECTS="openstack/tempest-lib $PROJECTS"
 #PROJECTS="openstack/tripleo-image-elements $PROJECTS"
 #PROJECTS="openstack/tripleo-incubator $PROJECTS"
 #PROJECTS="openstack/trove $PROJECTS"
-PROJECTS="osrg/ryu $PROJECTS"
+PROJECTS="${DEVSTACK_GATE_3PPRJ_BASE}/ryu $PROJECTS"
 
 
 export BASE=/opt/stack
@@ -131,6 +134,8 @@ fi
 # Make a directory to store logs
 rm -rf $WORKSPACE/logs
 mkdir -p $WORKSPACE/logs
+rm -rf $WORKSPACE/confs
+mkdir -p $WORKSPACE/confs
 
 # The feature matrix to select devstack-gate components
 export DEVSTACK_GATE_FEATURE_MATRIX=${DEVSTACK_GATE_FEATURE_MATRIX:-features.yaml}
@@ -325,6 +330,12 @@ export OVERRIDE_ZUUL_BRANCH=${OVERRIDE_ZUUL_BRANCH:-$ZUUL_BRANCH}
 # postgresql, mongodb.
 export DEVSTACK_GATE_CEILOMETER_BACKEND=${DEVSTACK_GATE_CEILOMETER_BACKEND:-mysql}
 
+# Set to 1 to run tempest tests for Ryu plugin
+export DEVSTACK_GATE_RYUPLUGIN=${DEVSTACK_GATE_RYUPLUGIN:-0}
+
+# Set to 1 to run tempest tests for OFAgent MD
+export DEVSTACK_GATE_OFAGENT=${DEVSTACK_GATE_OFAGENT:-0}
+
 if ! function_exists "gate_hook"; then
     # the command we use to run the gate
     function gate_hook {
@@ -341,6 +352,12 @@ indent df -h
 echo "Setting up the host"
 echo "... this takes a few seconds (logs at logs/devstack-gate-setup-host.txt.gz)"
 tsfilter setup_host &> $WORKSPACE/logs/devstack-gate-setup-host.txt
+
+if [ -d /opt/git/${DEVSTACK_GATE_3PPRJ_BASE}/devstack-gate ]; then
+    rsync -a /opt/git/${DEVSTACK_GATE_3PPRJ_BASE}/devstack-gate/ ${BASE}/new/devstack-gate
+fi
+tsfilter setup_project "${DEVSTACK_GATE_3PPRJ_BASE}/devstack-gate" "$DEVSTACK_GATE_3PBRANCH" &> \
+    $WORKSPACE/logs/devstack-gate-${DEVSTACK_GATE_3PBRANCH}.txt
 
 if [ -n "$DEVSTACK_GATE_GRENADE" ]; then
     echo "Setting up the new (migrate to) workspace"
@@ -363,6 +380,16 @@ if [ -d "$WORKSPACE/logs" -a \! -e "$BASE/logs" ]; then
     sudo mv $WORKSPACE/logs $BASE/
     ln -s $BASE/logs $WORKSPACE/
 fi
+if [ -d "$WORKSPACE/confs" -a ! -e "$BASE/confs" ]; then
+    sudo mv $WORKSPACE/confs $BASE/
+    ln -s $BASE/confs $WORKSPACE/
+fi
+
+function pre_test_hook {
+  for f in /opt/stack/new/devstack/files/apts/*; do
+    sudo sed -i '/^python-\(iso8601\|crypto\|netaddr\|cmd2\)\(\s\+\|$\)/d' $f
+  done
+}
 
 # Run pre test hook if we have one
 if function_exists "pre_test_hook"; then

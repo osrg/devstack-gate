@@ -263,6 +263,9 @@ function setup_project {
     local branch=$2
     local short_project=`basename $project`
     local git_base=${GIT_BASE:-https://git.openstack.org}
+    if [ ${project%%/*} = "$DEVSTACK_GATE_3PPRJ_BASE" ]; then
+        git_base=https://github.com
+    fi
 
     echo "Setting up $project @ $branch"
     git_clone_and_cd $project $short_project
@@ -584,6 +587,9 @@ function cleanup_host {
         xargs -0 -I {} sudo cp {} $NEWLOGTARGET/
     sudo cp $BASE/new/devstacklog.txt $NEWLOGTARGET/
     sudo cp $BASE/new/devstack/localrc $NEWLOGTARGET/localrc.txt
+    if [ -e $BASE/new/devstack/local.conf ]; then
+        sudo cp $BASE/new/devstack/local.conf $NEWLOGTARGET/local.conf.txt
+    fi
 
     # Copy failure files if they exist
     if [ $(ls $BASE/status/stack/*.failure | wc -l) -gt 0 ]; then
@@ -595,6 +601,12 @@ function cleanup_host {
     if [ -d $BASE/new/ironic-bm-logs ] ; then
         sudo mkdir -p $BASE/logs/ironic-bm-logs
         sudo cp $BASE/new/ironic-bm-logs/*.log $BASE/logs/ironic-bm-logs/
+    fi
+
+    # Copy devstack config file
+    sudo cp $BASE/new/devstack/localrc $BASE/confs/
+    if [ -e $BASE/new/devstack/local.conf ]; then
+        sudo cp $BASE/new/devstack/local.conf $BASE/confs/
     fi
 
     # Copy tempest config file
