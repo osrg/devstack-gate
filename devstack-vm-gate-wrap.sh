@@ -30,6 +30,7 @@ export PATH=$PATH:/usr/local/sbin:/usr/sbin
 # third party project base and branch
 DEVSTACK_GATE_3PPRJ_BASE=${DEVSTACK_GATE_3PPRJ_BASE:-osrg}
 DEVSTACK_GATE_3PBRANCH=${DEVSTACK_GATE_3PBRANCH:-ofaci}
+OVERRIDE_DEVSTACK_GATE_PROJECT_BRANCH=$DEVSTACK_GATE_3PBRANCH
 
 source $WORKSPACE/devstack-gate/functions.sh
 
@@ -102,7 +103,7 @@ PROJECTS="openstack/tempest-lib $PROJECTS"
 #PROJECTS="openstack/tripleo-incubator $PROJECTS"
 #PROJECTS="openstack/trove $PROJECTS"
 PROJECTS="${DEVSTACK_GATE_3PPRJ_BASE}/ryu $PROJECTS"
-
+PROJECTS="${DEVSTACK_GATE_3PPRJ_BASE}/devstack-gate $PROJECTS"
 
 export BASE=/opt/stack
 
@@ -352,12 +353,6 @@ indent df -h
 echo "Setting up the host"
 echo "... this takes a few seconds (logs at logs/devstack-gate-setup-host.txt.gz)"
 tsfilter setup_host &> $WORKSPACE/logs/devstack-gate-setup-host.txt
-
-if [ -d /opt/git/${DEVSTACK_GATE_3PPRJ_BASE}/devstack-gate ]; then
-    rsync -a /opt/git/${DEVSTACK_GATE_3PPRJ_BASE}/devstack-gate/ ${BASE}/new/devstack-gate
-fi
-tsfilter setup_project "${DEVSTACK_GATE_3PPRJ_BASE}/devstack-gate" "$DEVSTACK_GATE_3PBRANCH" &> \
-    $WORKSPACE/logs/devstack-gate-${DEVSTACK_GATE_3PBRANCH}.txt
 
 if [ -n "$DEVSTACK_GATE_GRENADE" ]; then
     echo "Setting up the new (migrate to) workspace"
