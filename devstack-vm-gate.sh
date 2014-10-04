@@ -483,7 +483,8 @@ if [[ "$DEVSTACK_GATE_TEMPEST" -eq "1" ]]; then
         echo "Running tempest neutron tests"
         sudo -H -u tempest tox -eall -- --concurrency=$TEMPEST_CONCURRENCY \
             tempest.api.network \
-            tempest.scenario.test_network_basic_ops
+            tempest.scenario.test_network_basic_ops \
+            tempest.scenario.test_security_groups_basic_ops
     else
         echo "Running tempest smoke tests"
         sudo -H -u tempest tox -esmoke -- --concurrency=$TEMPEST_CONCURRENCY
