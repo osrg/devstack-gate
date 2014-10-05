@@ -288,12 +288,14 @@ EOF
 
     if [ "$DEVSTACK_GATE_RYUPLUGIN" -eq "1" ]; then
         cat <<EOF >>localrc
+ENABLE_HTTPD_MOD_WSGI_SERVICES=False
 Q_PLUGIN=ryu
 NETWORK_API_EXTENSIONS=service-type,ext-gw-mode,security-group,fwaas,binding,external-net,router,lbaas,extraroute,quotas
 RYU_APPS=ryu.app.gre_tunnel,ryu.app.quantum_adapter,ryu.app.rest,ryu.app.rest_conf_switch,ryu.app.rest_tunnel,ryu.app.tunnel_port_updater,ryu.app.rest_quantum
 EOF
     elif [ "$DEVSTACK_GATE_OFAGENT" -eq "1" ]; then
         cat <<EOF >>localrc
+ENABLE_HTTPD_MOD_WSGI_SERVICES=False
 Q_PLUGIN=ml2
 Q_AGENT=ofagent
 Q_ML2_PLUGIN_MECHANISM_DRIVERS=ofagent,l2population
