@@ -472,21 +472,6 @@ if [[ "$DEVSTACK_GATE_TEMPEST" -eq "1" ]]; then
     elif [[ "$DEVSTACK_GATE_SMOKE_SERIAL" -eq "1" ]] ; then
         echo "Running tempest smoke tests"
         sudo -H -u tempest tox -esmoke-serial
-    elif [[ "$DEVSTACK_GATE_RYUPLUGIN" -eq "1" ]] ; then
-        echo "Running tempest neutron tests"
-        sudo -H -u tempest tox -eall -- --concurrency=$TEMPEST_CONCURRENCY \
-            tempest.api.network.test_networks \
-            tempest.api.network.test_floating_ips \
-            tempest.api.network.test_security_groups \
-            tempest.api.network.test_security_groups_negative \
-            tempest.api.network.test_load_balancer \
-            tempest.api.network.test_service_type_management
-    elif [[ "$DEVSTACK_GATE_OFAGENT" -eq "1" ]] ; then
-        echo "Running tempest neutron tests"
-        sudo -H -u tempest tox -eall -- --concurrency=$TEMPEST_CONCURRENCY \
-            tempest.api.network \
-            tempest.scenario.test_network_basic_ops \
-            tempest.scenario.test_security_groups_basic_ops
     else
         echo "Running tempest smoke tests"
         sudo -H -u tempest tox -esmoke -- --concurrency=$TEMPEST_CONCURRENCY
