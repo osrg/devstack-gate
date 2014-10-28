@@ -381,6 +381,10 @@ function setup_workspace {
 
 function copy_mirror_config {
 
+    if ! `grep tarballs.openstack.org ~/.pip/pip.conf > /dev/null`; then
+        echo "extra-index-url = http://tarballs.openstack.org http://pypi.python.org/simple" >> ~/.pip/pip.conf
+    fi
+
     sudo install -D -m0644 -o root -g root ~/.pydistutils.cfg ~root/.pydistutils.cfg
     sudo install -D -m0644 -o root -g root ~/.pip/pip.conf ~root/.pip/pip.conf
 
