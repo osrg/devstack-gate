@@ -408,12 +408,14 @@ if [ $GATE_RETVAL -ne 0 ]; then
 fi
 
 # Run post test hook if we have one
-if [ $GATE_RETVAL -eq 0 ] && function_exists "post_test_hook"; then
+if function_exists "post_test_hook"; then
     echo "Running post_test_hook"
     xtrace=$(set +o | grep xtrace)
     set -o xtrace -o pipefail
     tsfilter post_test_hook | tee $WORKSPACE/devstack-gate-post-test-hook.txt
-    RETVAL=$?
+    if [ $GATE_RETVAL -eq 0 ]; then
+        RETVAL=$?
+    fi
     sudo mv $WORKSPACE/devstack-gate-post-test-hook.txt $BASE/logs/
     set +o pipefail
     $xtrace
