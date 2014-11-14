@@ -380,12 +380,6 @@ if [ -d "$WORKSPACE/confs" -a ! -e "$BASE/confs" ]; then
     ln -s $BASE/confs $WORKSPACE/
 fi
 
-function pre_test_hook {
-  for f in /opt/stack/new/devstack/files/apts/*; do
-    sudo sed -i '/^python-\(iso8601\|crypto\|netaddr\|cmd2\)\(\s\+\|$\)/d' $f
-  done
-}
-
 # Run pre test hook if we have one
 if function_exists "pre_test_hook"; then
     echo "Running pre_test_hook"
