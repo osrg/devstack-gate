@@ -390,12 +390,6 @@ if [ -d "$WORKSPACE/confs" -a ! -e "$BASE/confs" ]; then
     ln -s $BASE/confs $WORKSPACE/
 fi
 
-function pre_test_hook {
-  for f in /opt/stack/new/devstack/files/apts/*; do
-    sudo sed -i '/^python-\(iso8601\|crypto\|netaddr\|cmd2\)\(\s\+\|$\)/d' $f
-  done
-}
-
 # The topology of the system determinates the service distribution
 # among the nodes.
 # aio: `all in one` just only one node used
