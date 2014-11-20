@@ -338,10 +338,12 @@ Q_PLUGIN=ml2
 Q_AGENT=ofagent
 Q_ML2_PLUGIN_MECHANISM_DRIVERS=ofagent,l2population
 Q_USE_PROVIDERNET_FOR_PUBLIC=True
+Q_USE_PUBLIC_VETH=True
 ENABLE_TENANT_TUNNELS=True
+PUBLIC_BRIDGE=br-int
 TENANT_TUNNEL_RANGES=1:1000
 PUBLIC_PHYSICAL_NETWORK=public
-OVS_BRIDGE_MAPPINGS=public:br-ex
+OFAGENT_PHYSICAL_INTERFACE_MAPPINGS=public:veth-pub-int
 NETWORK_API_EXTENSIONS=service-type,ext-gw-mode,security-group,l3_agent_scheduler,lbaas_agent_scheduler,fwaas,binding,provider,agent,quotas,dhcp_agent_scheduler,multi-provider,external-net,router,allowed-address-pairs,vpnaas,extra_dhcp_opt,lbaas,extraroute
 EOF
         cat <<EOF >>local.conf
