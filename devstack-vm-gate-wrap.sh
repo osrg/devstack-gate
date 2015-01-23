@@ -27,6 +27,9 @@ GIT_BRANCH=${GIT_BRANCH:-master}
 
 # sshd may have been compiled with a default path excluding */sbin
 export PATH=$PATH:/usr/local/sbin:/usr/sbin
+# third party project base and branch
+DEVSTACK_GATE_3PPRJ_BASE=${DEVSTACK_GATE_3PPRJ_BASE:-osrg}
+DEVSTACK_GATE_3PBRANCH=${DEVSTACK_GATE_3PBRANCH:-ofaci}
 
 source $WORKSPACE/devstack-gate/functions.sh
 
@@ -334,6 +337,12 @@ export DEVSTACK_GATE_CEILOMETER_BACKEND=${DEVSTACK_GATE_CEILOMETER_BACKEND:-mysq
 
 # Set Zaqar backend to override the default one. It could be mongodb, redis.
 export DEVSTACK_GATE_ZAQAR_BACKEND=${DEVSTACK_GATE_ZAQAR_BACKEND:-mongodb}
+
+# Set to 1 to run tempest tests for Ryu plugin
+export DEVSTACK_GATE_RYUPLUGIN=${DEVSTACK_GATE_RYUPLUGIN:-0}
+
+# Set to 1 to run tempest tests for OFAgent MD
+export DEVSTACK_GATE_OFAGENT=${DEVSTACK_GATE_OFAGENT:-0}
 
 if ! function_exists "gate_hook"; then
     # the command we use to run the gate

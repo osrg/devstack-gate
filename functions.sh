@@ -201,6 +201,9 @@ function git_clone_and_cd {
     local project=$1
     local short_project=$2
     local git_base=${GIT_BASE:-https://git.openstack.org}
+    if [ ${project%%/*} = "$DEVSTACK_GATE_3PPRJ_BASE" ]; then
+        git_base=https://github.com
+    fi
 
     if [[ ! -e $short_project ]]; then
         echo "  Need to clone $short_project"
@@ -284,6 +287,9 @@ function setup_project {
     local branch=$2
     local short_project=`basename $project`
     local git_base=${GIT_BASE:-https://git.openstack.org}
+    if [ ${project%%/*} = "$DEVSTACK_GATE_3PPRJ_BASE" ]; then
+        git_base=https://github.com
+    fi
 
     echo "Setting up $project @ $branch"
     git_clone_and_cd $project $short_project
