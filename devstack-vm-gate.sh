@@ -335,13 +335,6 @@ EOF
         echo "$DEVSTACK_LOCAL_CONFIG" >>"$localrc_file"
     fi
 
-    if [ "$DEVSTACK_GATE_OFAGENT" -eq "1" ]; then
-        cat <<EOF >>local.conf
-[[post-config|/etc/neutron/plugins/ml2/ml2_conf.ini]]
-[agent]
-l2_population=True
-EOF
-    fi
 }
 
 if [[ -n "$DEVSTACK_GATE_GRENADE" ]]; then
