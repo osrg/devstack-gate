@@ -611,6 +611,9 @@ function cleanup_host {
     if [ -f $BASE/new/devstack/tempest.log ]; then
         sudo cp $BASE/new/devstack/tempest.log $NEWLOGTARGET/verify_tempest_conf.log
     fi
+    if [ -e $BASE/new/devstack/local.conf ]; then
+        sudo cp $BASE/new/devstack/local.conf $NEWLOGTARGET/local.conf.txt
+    fi
 
     # Copy failure files if they exist
     if [ $(ls $BASE/status/stack/*.failure | wc -l) -gt 0 ]; then
@@ -622,6 +625,12 @@ function cleanup_host {
     if [ -d $BASE/new/ironic-bm-logs ] ; then
         sudo mkdir -p $BASE/logs/ironic-bm-logs
         sudo cp $BASE/new/ironic-bm-logs/*.log $BASE/logs/ironic-bm-logs/
+    fi
+
+    # Copy devstack config file
+    sudo cp $BASE/new/devstack/localrc $BASE/confs/
+    if [ -e $BASE/new/devstack/local.conf ]; then
+        sudo cp $BASE/new/devstack/local.conf $BASE/confs/
     fi
 
     # Copy tempest config file

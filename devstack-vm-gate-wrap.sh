@@ -142,6 +142,8 @@ fi
 # Make a directory to store logs
 rm -rf $WORKSPACE/logs
 mkdir -p $WORKSPACE/logs
+rm -rf $WORKSPACE/confs
+mkdir -p $WORKSPACE/confs
 
 # The feature matrix to select devstack-gate components
 export DEVSTACK_GATE_FEATURE_MATRIX=${DEVSTACK_GATE_FEATURE_MATRIX:-features.yaml}
@@ -383,6 +385,10 @@ fi
 if [ -d "$WORKSPACE/logs" -a \! -e "$BASE/logs" ]; then
     sudo mv $WORKSPACE/logs $BASE/
     ln -s $BASE/logs $WORKSPACE/
+fi
+if [ -d "$WORKSPACE/confs" -a ! -e "$BASE/confs" ]; then
+    sudo mv $WORKSPACE/confs $BASE/
+    ln -s $BASE/confs $WORKSPACE/
 fi
 
 # The topology of the system determinates the service distribution
