@@ -334,6 +334,9 @@ EOF
     if [[ -n "$DEVSTACK_LOCAL_CONFIG" ]]; then
         echo "$DEVSTACK_LOCAL_CONFIG" >>"$localrc_file"
     fi
+    if [[ -n "$DEVSTACK_ENABLE_PLUGIN" ]]; then
+        echo "$DEVSTACK_ENABLE_PLUGIN" >>"$localrc_file"
+    fi
 
 }
 
